@@ -6,6 +6,7 @@ langchain
 langchain-core
 langchain-openai
 langgraph
+langfuse
 fastapi
 uvicorn[standard]
 pytest

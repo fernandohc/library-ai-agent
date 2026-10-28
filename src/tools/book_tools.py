@@ -27,18 +27,6 @@ def search_books(title: str) -> list[dict]:
 
 
 @tool
-def search_available_books_by_genre(genre: str) -> list[dict]:
-    """
-    Find books of a specific genre that have available copies.
-    Returns book details and the number of available copies.
-    Use this tool when the user wants books of a genre
-    that can currently be borrowed.
-    """
-
-    return get_container().book_service.search_available_by_genre(genre)
-
-
-@tool
 def get_book(book_id: str) -> dict | None:
     """
     Get detailed information about a book using its ID.
@@ -123,3 +111,48 @@ def check_availability(book_id: str) -> dict:
         "available_copies": available_copies,
         "available": available_copies > 0,
     }
+
+
+@tool(return_direct=True)
+def search_available_books_by_genre(genre: str) -> str:
+    """
+    Find books of a specific genre that have available copies.
+    Returns a formatted list of books and the number of available copies.
+    Use this tool when the user wants books of a genre
+    that can currently be borrowed.
+    """
+
+    books = get_container().book_service.search_available_by_genre(genre)
+
+    if not books:
+        return f"No available books found for the genre '{genre}'."
+
+    lines = [f"Found {len(books)} available books in the genre '{genre}':"]
+
+    for index, book in enumerate(books, start=1):
+        authors = book.get("authors", [])
+        author_names = [
+            author.get("name", "Unknown") if isinstance(author, dict) else str(author)
+            for author in authors
+        ]
+
+        genres = book.get("genres", [])
+        rating = book.get("rating", {})
+        if isinstance(rating, dict):
+            rating = rating.get("average")
+
+        lines.append("")
+        lines.append(f"{index}. {book.get('title', 'Untitled')}")
+
+        if author_names:
+            lines.append(f"   Authors: {', '.join(author_names)}")
+
+        if genres:
+            lines.append(f"   Genres: {', '.join(genres)}")
+
+        if rating is not None:
+            lines.append(f"   Rating: {rating}")
+
+        lines.append(f"   Available copies: {book.get('available_copies', 0)}")
+
+    return "\n".join(lines)

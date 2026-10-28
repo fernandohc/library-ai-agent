@@ -110,7 +110,16 @@ class BookRepository:
                 }
             },
             {"$match": {"available_copies": {"$gt": 0}}},
-            {"$project": {"availability": 0}},
+            {
+                "$project": {
+                    "_id": 0,
+                    "title": 1,
+                    "authors.name": 1,
+                    "genres": 1,
+                    "rating.average": 1,
+                    "available_copies": 1,
+                }
+            },
         ]
 
         return list(self.collection.aggregate(pipeline))

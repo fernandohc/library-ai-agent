@@ -2,6 +2,7 @@ services:
   mongodb:
     image: mongo:8
     container_name: library-mongodb
+    command: ["mongod", "--quiet"]
     restart: unless-stopped
     
     healthcheck:
@@ -41,6 +42,10 @@ services:
       MONGODB_URI: mongodb://library_app:library_app_password@mongodb:27017/library_ai?authSource=library_ai
       MONGODB_DATABASE: library_ai
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
+      LANGFUSE_TRACING_ENVIRONMENT: ${LANGFUSE_TRACING_ENVIRONMENT:-development}
     depends_on:
       mongodb:
         condition: service_healthy
